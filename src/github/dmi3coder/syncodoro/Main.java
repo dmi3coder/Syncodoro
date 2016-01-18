@@ -17,17 +17,19 @@ import javax.swing.*;
  */
 public class Main extends Application {
     static final Client mKinveyClient = new Client.Builder("kid_-kHgALiOhe", "0952a33bb5864a49a0f7ebf63cecf5d2").build();
+    private Label progressTimer;
+    private Arc progressArc;
+    private Scene rootScene;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
-        Scene scene = new Scene(root,640, 420);
-        Label processTimer = (Label) scene.lookup("#progressTimer");
-        Arc processCircle = (Arc)scene.lookup("#progressCircle");
-        processCircle.setLength(250);
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(scene);
+        rootScene = new Scene(root,640, 420);
+        progressTimer = (Label) rootScene.lookup("#progressTimer");
+        progressArc = (Arc)rootScene.lookup("#progressCircle");
+        primaryStage.setTitle("Syncodoro");
+        primaryStage.setScene(rootScene);
         primaryStage.show();
-
     }
 
 
