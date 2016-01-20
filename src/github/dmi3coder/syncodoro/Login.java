@@ -35,6 +35,7 @@ public class Login extends Application{
         Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
         rootScene = new Scene(root,640, 420);
         usernameField = (JFXTextField) root.lookup("#usernameField");
+        usernameField.setText("test");
         passwordField = (JFXPasswordField) root.lookup("#passwordField");
         repeatPasswordField = (JFXPasswordField)root.lookup("#repeatPasswordField");
         loginStage.setTitle("User process panel");
