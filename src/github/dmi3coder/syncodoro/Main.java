@@ -10,6 +10,7 @@ import javafx.scene.shape.Arc;
 import javafx.stage.Stage;
 import sun.rmi.runtime.Log;
 
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
@@ -19,11 +20,14 @@ import java.util.prefs.Preferences;
 public class Main extends Application {
     public static final int VERSION = 1;
     public static final String VERSION_STRING="0.0.1";
-    static final Client mKinveyClient = new Client.Builder("kid_-kHgALiOhe", "0952a33bb5864a49a0f7ebf63cecf5d2").build();
     private Label progressTimer;
     private Arc progressArc;
     private Scene rootScene;
     public static Preferences preferences = Preferences.userNodeForPackage(Main.class);
+    public static ResourceBundle bundle = ResourceBundle.getBundle("strings");
+    static final Client mKinveyClient = new Client.Builder(
+            bundle.getString("APPID"),
+            bundle.getString("APPSECRET")).build();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -40,7 +44,7 @@ public class Main extends Application {
             //preferences.putBoolean("isFirstLogin",false);
             showLoginForm();
             defineStandardValues();
-            new Login().start(new Stage());
+            new Login(mKinveyClient).start(new Stage());
         }
     }
 
