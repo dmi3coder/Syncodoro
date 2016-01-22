@@ -11,9 +11,11 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
@@ -22,24 +24,37 @@ import java.io.IOException;
  */
 public class Login extends Application implements EventHandler<ActionEvent>{
     private Scene rootScene;
-    JFXTextField usernameField;
-    JFXPasswordField passwordField,repeatPasswordField;
-    JFXCheckBox isSignUpCheckBox;
-    JFXButton processButton;
-    Label errorText;
-    Client client;
+    private JFXTextField usernameField;
+    private JFXPasswordField passwordField,repeatPasswordField;
+    private JFXCheckBox isSignUpCheckBox;
+    private JFXButton processButton;
+    private Label errorText;
+    private Client backendClient;
+    private Stage loginStage;
 
-    public Login(Client client){
-        this.client = client;
+
+    public Login(Client backendClient){
+        this.backendClient = backendClient;
     }
 
     @Override
     public void start(final Stage loginStage)  throws IOException {
+        this.loginStage = loginStage;
         defineElements();
         setActions();
         loginStage.setTitle("User process panel");
         loginStage.setScene(rootScene);
         loginStage.show();
+        loginStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("You can loose your sync!");
+                alert.setHeaderText(null);
+                alert.setContentText("Use [Syncodor -> Login] to login in future");
+                alert.show();
+            }
+        });
 
     }
 
@@ -74,15 +89,16 @@ public class Login extends Application implements EventHandler<ActionEvent>{
                 errorText.setVisible(true);
             }
             else if(isSignUpCheckBox.isSelected()) {
-            client.user().createBlocking(usernameField.getText(),passwordField.getText()).execute();
-                //TODO add client registration check
+            backendClient.user().createBlocking(usernameField.getText(),passwordField.getText()).execute();
+                //TODO add backendClient registration check
+                loginStage.close();
             }
             else {
-                client.user().loginBlocking(usernameField.getText(),passwordField.getText()).execute();
+                backendClient.user().loginBlocking(usernameField.getText(),passwordField.getText()).execute();
 
             }
         } catch (IOException e) {
-
+            System.out.println(e.toString());
         }
     }
 

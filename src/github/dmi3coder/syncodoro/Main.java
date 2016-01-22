@@ -8,10 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Arc;
 import javafx.stage.Stage;
-import sun.rmi.runtime.Log;
 
 import java.util.ResourceBundle;
-import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
 /**
@@ -25,19 +23,13 @@ public class Main extends Application {
     private Scene rootScene;
     public static Preferences preferences = Preferences.userNodeForPackage(Main.class);
     public static ResourceBundle bundle = ResourceBundle.getBundle("github.dmi3coder.syncodoro.strings");
-    static final Client mKinveyClient = new Client.Builder(
+    static final Client backendClient = new Client.Builder(
             bundle.getString("APPID"),
             bundle.getString("APPSECRET")).build();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
-        if(preferences.getBoolean("isFirstLogin",true)){
-            //preferences.putBoolean("isFirstLogin",false);
-            showLoginForm();
-            defineStandardValues();
-            new Login(mKinveyClient).start(new Stage());
-        }
         rootScene = new Scene(root,640, 420);
         progressTimer = (Label) rootScene.lookup("#progressTimer");
         progressTimer.setText(preferences.getInt("session_minutes",25)+":" +preferences.getInt("session_seconds",0));
@@ -45,7 +37,12 @@ public class Main extends Application {
         primaryStage.setTitle("Syncodoro");
         primaryStage.setScene(rootScene);
         primaryStage.show();
-
+        if(preferences.getBoolean("isFirstLogin",true)){
+            //preferences.putBoolean("isFirstLogin",false);
+            showLoginForm();
+            defineStandardValues();
+            new Login(backendClient).start(new Stage());
+        }
 
     }
 
