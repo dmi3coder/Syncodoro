@@ -1,10 +1,14 @@
 package github.dmi3coder.syncodoro;
 
+import com.google.common.annotations.Beta;
+import com.google.common.eventbus.EventBus;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.kinvey.nativejava.Client;
+import github.dmi3coder.syncodoro.event.LoginUserEvent;
+import github.dmi3coder.syncodoro.ui.ErrorTextField;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -45,15 +49,12 @@ public class Login extends Application implements EventHandler<ActionEvent>{
         loginStage.setTitle("User process panel");
         loginStage.setScene(rootScene);
         loginStage.show();
-        loginStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("You can loose your sync!");
-                alert.setHeaderText(null);
-                alert.setContentText("Use [Syncodor -> Login] to login in future");
-                alert.show();
-            }
+        loginStage.setOnCloseRequest(event -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("You can loose your sync!");
+            alert.setHeaderText(null);
+            alert.setContentText("Use [Syncodoro -> Login] to login in future");
+            alert.show();
         });
 
     }
@@ -84,21 +85,44 @@ public class Login extends Application implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-        try {
-            if(isFieldsEmpty()){
-                errorText.setVisible(true);
-            }
-            else if(isSignUpCheckBox.isSelected()) {
-            backendClient.user().createBlocking(usernameField.getText(),passwordField.getText()).execute();
-                //TODO add backendClient registration check
-                loginStage.close();
-            }
-            else {
-                backendClient.user().loginBlocking(usernameField.getText(),passwordField.getText()).execute();
+        if (isFieldsEmpty()) {
+            errorText.setVisible(true);
+            errorText.setText(Main.bundle.getString("loginErrorFillField"));
+        } else if (isSignUpCheckBox.isSelected()) {
+            handleRegistration();
+        } else {
+            handleLogin();
 
-            }
-        } catch (IOException e) {
-            System.out.println(e.toString());
+        }
+    }
+
+
+
+    private void handleLogin() {
+        try {
+            if(!isFieldsHaveInvalidChars()) backendClient.user().loginBlocking(usernameField.getText(), passwordField.getText()).execute();
+        }catch (Exception e){
+            errorText.setText(Main.bundle.getString("loginErrorWrongPassword"));
+            errorText.setVisible(true);
+        }
+
+    }
+
+
+    //FIXME make check for illegal chars
+    private boolean isFieldsHaveInvalidChars() {
+        if(usernameField.getText().matches("^.*[~#@*+%{}<>\\[\\]|\"\\_].*$")|passwordField.getText().contains("!@#$%^&*()\";/.,+_\\/*-+")){
+            System.out.println("consist!");
+            return true;
+        }
+        else return false;
+    }
+
+    private void handleRegistration() {
+        try {
+            backendClient.user().createBlocking(usernameField.getText(), passwordField.getText()).execute();
+        }catch (Exception e){
+
         }
     }
 

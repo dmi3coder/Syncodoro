@@ -1,6 +1,10 @@
 package github.dmi3coder.syncodoro;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.kinvey.nativejava.Client;
+import github.dmi3coder.syncodoro.event.LoginUserEvent;
+import github.dmi3coder.syncodoro.event.handler.LoginUserSubscriber;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.shape.Arc;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
@@ -36,6 +41,7 @@ public class Main extends Application {
         progressArc = (Arc)rootScene.lookup("#progressCircle");
         primaryStage.setTitle("Syncodoro");
         primaryStage.setScene(rootScene);
+        backendClient.user().logout().execute();
         primaryStage.show();
         if(preferences.getBoolean("isFirstLogin",true)){
             //preferences.putBoolean("isFirstLogin",false);
